@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stamatr/features/onboarding/onboarding_screen.dart';
 import 'package:stamatr/features/splash/splash_screen.dart';
 
 void main() {
@@ -10,6 +11,6 @@ class Stamatr extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(debugShowCheckedModeBanner: false, home: Splash());
+    return const MaterialApp(debugShowCheckedModeBanner: false, home: OnboardingScreen());
   }
 }
