@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stamatr/features/auth/login_screen.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -37,9 +38,12 @@ class OnboardingScreen extends StatelessWidget {
                   style: TextStyle(color: Color(0xFFBDC1CA)),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 134),
+                Spacer(),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool("seen_onboarding", true);
+                    if (!context.mounted) return;
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -55,6 +59,7 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                   child: const Text("Get Started"),
                 ),
+                SizedBox(height: 25),
               ],
             ),
           ),
