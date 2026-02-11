@@ -1,8 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:stamatr/features/homeScreen/home_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool isLoading = false;
+  String? loadingProvider ;
+  Future<void> _handleLogin(String provider) async {
+    if (isLoading) return;
+    setState(() {
+      isLoading = true;
+      loadingProvider = provider;
+    });
+    try {
+      await Future.delayed(Duration(seconds: 2));
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } catch (c) {
+      // TODO :SnackBar
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+        loadingProvider = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -20,19 +53,36 @@ class LoginScreen extends StatelessWidget {
               children: [
                 Image.asset('assets/images/logo.png'),
                 // الصوره فيها Padding تلقائي
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF526EE0),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(6),
+                Opacity(
+                  opacity: (isLoading && loadingProvider != "anonymous")
+                      ? .5
+                      : 1.0,
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: (isLoading && loadingProvider != "anonymous")
+                          ? null
+                          : () => _handleLogin("anonymous"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF526EE0),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(6),
+                        ),
                       ),
+                      child: (isLoading && loadingProvider == "anonymous")
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text("Continue without an account"),
                     ),
-                    child: const Text("Continue without an account"),
                   ),
                 ),
                 SizedBox(height: 18),
@@ -65,13 +115,16 @@ class LoginScreen extends StatelessWidget {
                   onTap: () {},
                 ),
                 SizedBox(height: 16),
-                SocialAuthButton(label: "Continue with Facebook",
-                    assetPath: 'assets/images/Group.svg', onTap: (){}),
-                SizedBox(height: 12,),
-                Text("You can use the app without creating an account." , style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white54,
-                ),)
+                SocialAuthButton(
+                  label: "Continue with Facebook",
+                  assetPath: 'assets/images/Group.svg',
+                  onTap: () {},
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "You can use the app without creating an account.",
+                  style: TextStyle(fontSize: 12, color: Colors.white54),
+                ),
               ],
             ),
           ),
