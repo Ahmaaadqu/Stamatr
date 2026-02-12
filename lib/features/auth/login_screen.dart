@@ -10,8 +10,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
   bool isLoading = false;
-  String? loadingProvider ;
+  String? loadingProvider;
   Future<void> _handleLogin(String provider) async {
     if (isLoading) return;
     setState(() {
@@ -55,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // الصوره فيها Padding تلقائي
                 Opacity(
                   opacity: (isLoading && loadingProvider != "anonymous")
-                      ? .5
+                      ? 0.5
                       : 1.0,
                   child: SizedBox(
                     width: double.infinity,
@@ -65,12 +66,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? null
                           : () => _handleLogin("anonymous"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF526EE0),
+                        backgroundColor: const Color(0xFF526EE0),
+                        disabledBackgroundColor: const Color(0xFF526EE0),
                         foregroundColor: Colors.white,
+                        disabledForegroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(6),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                       ),
+
                       child: (isLoading && loadingProvider == "anonymous")
                           ? SizedBox(
                               width: 20,
@@ -110,15 +114,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 24),
                 SocialAuthButton(
+                  isLoading: isLoading && loadingProvider == 'google',
+                  isDisabled: isLoading && loadingProvider!= 'google',
                   label: 'Continue with Google',
                   assetPath: 'assets/images/Chrome.svg',
-                  onTap: () {},
+                  onTap: () {
+
+                    _handleLogin('google');
+
+                  },
                 ),
                 SizedBox(height: 16),
                 SocialAuthButton(
+                  isLoading: isLoading && loadingProvider == 'facebook',
+                  isDisabled: isLoading && loadingProvider!= 'facebook',
                   label: "Continue with Facebook",
                   assetPath: 'assets/images/Group.svg',
-                  onTap: () {},
+                  onTap: () {
+                    _handleLogin('facebook');
+                  },
+
                 ),
                 SizedBox(height: 12),
                 Text(
@@ -140,34 +155,49 @@ class SocialAuthButton extends StatelessWidget {
     required this.label,
     required this.assetPath,
     required this.onTap,
+    required this.isLoading,
+    required this.isDisabled,
   });
-
+  final isLoading;
+  final isDisabled;
   final String label;
   final String assetPath;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.white24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 10,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(assetPath, width: 22, height: 22),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+    return Opacity(
+      opacity: isDisabled ? 0.5 : 1,
+      child: SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: OutlinedButton(
+          onPressed: isDisabled ? null : onTap,
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Colors.white24),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          ),
+          child: isLoading ? const SizedBox(
+            height:20 ,
+            width: 20,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2,
             ),
-          ],
+          ) :
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 10,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(assetPath, width: 22, height: 22),
+              Text(
+                label,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ],
+          ),
         ),
       ),
     );
